@@ -11,7 +11,7 @@ export function Interface() {
         viewMode, setViewMode,
         triggerScreenshot,
         isConfigOpen, toggleConfig,
-        sunIntensity, envIntensity, sunColor, updateConfig, resetConfig,
+        sunIntensity, envIntensity, hdriIntensity, sunColor, updateConfig, resetConfig,
         flashTrigger
     } = useStore();
 
@@ -238,6 +238,18 @@ export function Interface() {
                             </div>
                             <div>
                                 <label className="block text-white/50 mb-3 uppercase tracking-[0.15em] font-light">
+                            <div>
+                                <label className="flex justify-between text-white/50 mb-3 uppercase tracking-[0.15em] font-light">
+                                    <span>HDRI Intensity</span>
+                                    <span className="text-emerald-400 font-medium">{hdriIntensity.toFixed(1)}</span>
+                                </label>
+                                <input
+                                    type="range" min="0" max="1" step="0.1"
+                                    value={hdriIntensity}
+                                    onChange={(e) => updateConfig("hdriIntensity", parseFloat(e.target.value))}
+                                    className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-emerald-400 hover:bg-white/15 transition-colors"
+                                />
+                            </div>
                                     Light Temperature
                                 </label>
                                 <input

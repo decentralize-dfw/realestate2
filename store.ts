@@ -6,10 +6,11 @@ export type ViewMode = 'orbit' | 'fps';
 interface ConfigState {
     sunIntensity: number;
     envIntensity: number;
+    hdriIntensity: number; // NEW: HDRI background intensity
     sunColor: string;
     isConfigOpen: boolean;
     toggleConfig: () => void;
-    updateConfig: (key: keyof Omit<ConfigState, 'isConfigOpen' | 'toggleConfig' | 'updateConfig'>, value: any) => void;
+    updateConfig: (key: keyof Omit<ConfigState, 'isConfigOpen' | 'toggleConfig' | 'updateConfig' | 'resetConfig'>, value: any) => void;
     resetConfig: () => void;
 }
 
@@ -18,11 +19,11 @@ interface AppState extends ConfigState {
     viewMode: ViewMode;
     currentChapter: number;
     subPhase: number; // For Scene 1 (0-2), Scene 2 (0-1), Scene 4 (0-5)
-    
+
     isMenuOpen: boolean;
     screenshotTrigger: number;
     flashTrigger: number; // Triggers the black fade effect
-    
+
     setQuality: (q: Quality) => void;
     setViewMode: (v: ViewMode) => void;
     setChapter: (index: number) => void;
@@ -35,6 +36,7 @@ interface AppState extends ConfigState {
 const DEFAULT_CONFIG = {
     sunIntensity: 2.8,
     envIntensity: 0.8,
+    hdriIntensity: 1.0, // NEW: Default HDRI intensity
     sunColor: '#fff9f0'
 };
 
@@ -55,8 +57,11 @@ export const useStore = create<AppState>((set) => ({
     setChapter: (index) => set((state) => {
         // Reset subphase when changing chapters
         const newPhase = 0;
-        // Trigger flash if entering interior (Chapter 4)
-        if (index === 4 && state.currentChapter !== 4) {
+        // Trigger flash for interior scenes (4, 5) and when leaving them
+        if ((index === 4 || index === 5) && (state.currentChapter !== 4 && state.currentChapter !== 5)) {
+             set({ flashTrigger: state.flashTrigger + 1 });
+        }
+        else if ((state.currentChapter === 4 || state.currentChapter === 5) && (index !== 4 && index !== 5)) {
              set({ flashTrigger: state.flashTrigger + 1 });
         }
         return { currentChapter: index, subPhase: newPhase };

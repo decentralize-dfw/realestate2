@@ -70,7 +70,7 @@ export function World() {
             <primitive object={city.scene} visible={s0 || s1 || s2_opt0} />
 
             {/* 1. GHOST */}
-            <primitive object={ghost.scene} visible={s3} />
+            <primitive object={ghost.scene} visible={s3} /> {/* Ghost for Anatomy */}
 
             {/* 2. METAL */}
             <primitive object={metal.scene} visible={s2_opt1} />
