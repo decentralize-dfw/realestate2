@@ -183,19 +183,28 @@ function HotspotMarkers() {
     return (
         <group>
             {activeHotspots.map((h, i) => {
+                const isActive = hovered === h.title;
                 return (
                     <Html key={i} position={new THREE.Vector3(...h.pos)} zIndexRange={[100, 0]}>
-                        <div 
+                        <div
                             className="relative group cursor-pointer"
                             onMouseEnter={() => setHover(h.title)}
                             onMouseLeave={() => setHover(null)}
                         >
-                            <div className="w-4 h-4 bg-emerald-500 rounded-full border-2 border-white animate-pulse shadow-[0_0_15px_rgba(16,185,129,0.8)] hover:scale-150 transition-transform"></div>
-                            
-                            {/* Label */}
-                            <div className={`absolute left-6 top-1/2 -translate-y-1/2 bg-black/80 backdrop-blur-md border-l-2 border-emerald-500 text-white p-2 w-48 transition-all duration-300 ${hovered === h.title ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}`}>
-                                <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">{h.title}</div>
-                                <div className="text-[9px] font-mono text-white/70">{h.desc}</div>
+                            {/* Marker Pulse Ring */}
+                            <div className="absolute inset-0 w-4 h-4 bg-emerald-400/30 rounded-full animate-ping"></div>
+
+                            {/* Core Marker */}
+                            <div className={`w-4 h-4 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-full border border-white/40 shadow-[0_0_20px_rgba(52,211,153,0.7)] transition-all duration-300 ${
+                                isActive ? 'scale-150 shadow-[0_0_30px_rgba(52,211,153,1)]' : 'hover:scale-125'
+                            }`}></div>
+
+                            {/* Information Panel */}
+                            <div className={`absolute left-7 top-1/2 -translate-y-1/2 bg-gradient-to-r from-black/95 via-black/90 to-black/85 backdrop-blur-xl border-l-2 border-emerald-400 text-white p-4 w-64 rounded-r-lg shadow-2xl transition-all duration-500 ease-out ${
+                                isActive ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-6 pointer-events-none'
+                            }`}>
+                                <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-400 mb-1.5 font-mono">{h.title}</div>
+                                <div className="text-[10px] font-mono text-white/60 tracking-wide font-light leading-relaxed">{h.desc}</div>
                             </div>
                         </div>
                     </Html>
@@ -215,7 +224,10 @@ export function Scene() {
 
     return (
         <>
-            <VRButton store={xrStore} className="!bg-black/50 !border-0 !text-[9px] !opacity-50 hover:!opacity-100 !bottom-4 !left-1/2 !-translate-x-1/2 absolute z-50 px-4 py-2 text-white rounded uppercase font-mono tracking-widest transition-opacity" />
+            <VRButton
+                store={xrStore}
+                className="!bg-gradient-to-br !from-black/70 !via-black/60 !to-black/70 !backdrop-blur-xl !border !border-white/20 !text-[9px] !opacity-60 hover:!opacity-100 hover:!border-emerald-400/50 hover:!shadow-[0_0_20px_rgba(52,211,153,0.3)] !bottom-6 !left-1/2 !-translate-x-1/2 !absolute !z-50 !px-6 !py-3 !text-white/80 hover:!text-white !rounded-lg !uppercase !font-mono !tracking-[0.25em] !transition-all !duration-300 !font-light"
+            />
             
             <KeyboardControls
                 map={[

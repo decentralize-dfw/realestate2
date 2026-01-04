@@ -71,78 +71,77 @@ export const useStore = create<AppState>((set) => ({
     resetConfig: () => set({ ...DEFAULT_CONFIG })
 }));
 
-// Data from original project
+// Curated Experience Chapters
 export const CHAPTER_DATA = [
-    { 
-        title: 'The Arrival', 
-        subtitle: 'Distinguished Living',
-        desc: 'Experience an architectural masterpiece that redefines urban luxury.',
-        detailTitle: 'Architectural Vision',
-        detailDesc: 'Isometric presentation revealing the complete design philosophy.',
+    {
+        title: 'Ascendance',
+        subtitle: 'Architectural Mastery',
+        desc: 'A statement of refinement emerges from the urban landscape—where visionary design transcends convention and redefines contemporary living.',
+        detailTitle: 'Design Philosophy',
+        detailDesc: 'An isometric perspective reveals the harmonious interplay of proportion, materiality, and spatial narrative.',
         options: []
     },
-    { 
-        title: 'Context', 
-        subtitle: 'Prime Location',
-        desc: 'Nestled in the heart of the city\'s most prestigious neighborhood.',
-        detailTitle: 'Urban Integration',
-        detailDesc: 'Seamlessly woven into the urban fabric.',
-        options: ['Surrounding', 'Transportation', 'Units'] 
+    {
+        title: 'Context',
+        subtitle: 'Urban Resonance',
+        desc: 'Thoughtfully positioned within a distinguished enclave, this residence commands its setting with quiet confidence and timeless presence.',
+        detailTitle: 'Contextual Integration',
+        detailDesc: 'Every element dialogues with its surroundings—a sophisticated fusion of heritage and innovation.',
+        options: ['Surroundings', 'Connectivity', 'Residences']
     },
-    { 
-        title: 'Design', 
-        subtitle: 'Pure Elegance',
-        desc: 'Timeless sophistication meets modern minimalism.',
-        detailTitle: 'Material Excellence',
-        detailDesc: 'Premium materials sourced globally.',
-        options: ['White Facade', 'Metal Concept']
+    {
+        title: 'Expression',
+        subtitle: 'Material Integrity',
+        desc: 'Each surface tells a story. Through the careful selection of materials and finishes, form transcends function to become art.',
+        detailTitle: 'Crafted Facades',
+        detailDesc: 'Meticulously curated palettes—alabaster purity meets sculptural metallics in perfect equilibrium.',
+        options: ['Luminous Facade', 'Metal Articulation']
     },
-    { 
-        title: 'Structure', 
-        subtitle: 'Intelligent Design',
-        desc: 'Ghost view revealing the sophisticated internal organization.',
-        detailTitle: 'Systems Integration',
-        detailDesc: 'State-of-the-art building systems.',
+    {
+        title: 'Anatomy',
+        subtitle: 'Structural Poetry',
+        desc: 'Beneath the surface lies extraordinary intelligence. A transparent revelation of engineered precision and thoughtful spatial choreography.',
+        detailTitle: 'Systems Excellence',
+        detailDesc: 'Advanced infrastructure seamlessly integrated—where innovation supports elevated living without compromise.',
         options: []
     },
-    { 
-        title: 'Interior', 
-        subtitle: 'Grand Salon',
-        desc: 'Floor-to-ceiling windows flood the expansive living area.',
-        detailTitle: 'Living Excellence',
-        detailDesc: 'Curated for entertaining and daily luxury.',
-        options: ['Salon', 'Kitchen', 'Bed 1', 'Bath 1', 'Bed 2', 'Bath 2']
+    {
+        title: 'Sanctuaries',
+        subtitle: 'Refined Interiors',
+        desc: 'Expansive volumes bathed in natural light. Every space orchestrated for comfort, elegance, and the quiet luxury of daily ritual.',
+        detailTitle: 'Curated Living',
+        detailDesc: 'Interiors designed for both intimate moments and sophisticated entertaining—a canvas for distinguished life.',
+        options: ['Grand Salon', 'Culinary Studio', 'Primary Suite', 'Primary Bath', 'Secondary Suite', 'Secondary Bath']
     },
-    { 
-        title: 'Walkthrough', 
-        subtitle: 'Free Exploration',
-        desc: 'Use W/A/S/D to move, Shift to sprint, Space to jump.',
-        detailTitle: 'Virtual Reality',
-        detailDesc: 'Full immersion. Feel the flow, discover the details.',
+    {
+        title: 'Immersion',
+        subtitle: 'Personal Discovery',
+        desc: 'Navigate freely through space. W/A/S/D keys guide your journey, Shift accelerates, Space elevates your perspective.',
+        detailTitle: 'Virtual Experience',
+        detailDesc: 'A fully immersive encounter—discover hidden details, appreciate spatial flow, and envision your story within.',
         options: []
     },
 ];
 
 export const HOTSPOTS_DATA = {
     surrounding: [
-        { pos: [-8, 2, 5], title: 'Central Park', desc: '800m - Green Space' },
-        { pos: [6, 1.5, -7], title: 'Shopping District', desc: '1.2km - Luxury Retail' },
-        { pos: [-5, 3, -6], title: 'Cultural Center', desc: '600m - Art Galleries' },
-        { pos: [7, 2.5, 4], title: 'Restaurant Row', desc: '450m - Fine Dining' }
+        { pos: [-8, 2, 5], title: 'Botanical Gardens', desc: '800m — Verdant Sanctuary' },
+        { pos: [6, 1.5, -7], title: 'Atelier District', desc: '1.2km — Curated Boutiques' },
+        { pos: [-5, 3, -6], title: 'Cultural Quarter', desc: '600m — Museums & Galleries' },
+        { pos: [7, 2.5, 4], title: 'Gastronomic Mile', desc: '450m — Michelin-Starred Dining' }
     ],
     transportation: [
-        { pos: [-3, 0.5, 6], title: 'Metro Line A', desc: '250m - City Center' },
-        { pos: [5, 0.5, -4], title: 'Bus Hub', desc: '180m - All Routes' },
-        { pos: [9, 0.5, -9], title: 'Helipad', desc: '3.2km - Private Service' }
+        { pos: [-3, 0.5, 6], title: 'Metro Nexus', desc: '250m — Direct City Access' },
+        { pos: [5, 0.5, -4], title: 'Transit Hub', desc: '180m — Comprehensive Network' },
+        { pos: [9, 0.5, -9], title: 'Private Aviation', desc: '3.2km — Exclusive Terminal' }
     ],
     units: [
-        { pos: [0, 12, 0], title: 'Penthouse', desc: 'Top Floor - 360 View' },
-        { pos: [3, 8, 3], title: '2BR Corner', desc: '12th Floor' },
-        { pos: [-3, 5, -3], title: 'Studio Loft', desc: '8th Floor' }
+        { pos: [0, 12, 0], title: 'Penthouse Sanctuary', desc: 'Crowning Level — Panoramic Vistas' },
+        { pos: [3, 8, 3], title: 'Corner Residence', desc: 'Elevated — Dual Exposure' },
+        { pos: [-3, 5, -3], title: 'Urban Retreat', desc: 'Mid-Rise — Private Balcony' }
     ],
     interior: [
-        // Dummy positions for Scene 4
-        { pos: [1.5, 1.0, 1.5], title: "Italian Marble", desc: "Carrara Import" },
-        { pos: [4, 1.2, 0], title: "Master Bed", desc: "King Size Suite" }
+        { pos: [1.5, 1.0, 1.5], title: "Carrara Marble", desc: "Italian Heritage Stone" },
+        { pos: [4, 1.2, 0], title: "Primary Suite", desc: "Bespoke Sanctuary" }
     ]
 };
