@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { Environment, AccumulativeShadows, RandomizedLight, KeyboardControls, OrbitControls, Preload, BakeShadows, Html } from '@react-three/drei';
 import { Physics } from '@react-three/rapier';
-import { XR, createXRStore } from '@react-three/xr';
+import { XR, VRButton, createXRStore } from '@react-three/xr';
 import { useStore, HOTSPOTS_DATA } from './store';
 import { Player } from './Player';
 import { Effects } from './Effects';
@@ -10,8 +10,8 @@ import { World } from './World';
 import gsap from 'gsap';
 import * as THREE from 'three';
 
-// --- XR STORE ---
-const store = createXRStore();
+// Create XR store
+const xrStore = createXRStore();
 
 // --- SUB-COMPONENTS ---
 
@@ -215,12 +215,7 @@ export function Scene() {
 
     return (
         <>
-            <button 
-                onClick={() => store.enterVR()}
-                className="!bg-black/50 !border-0 !text-[9px] !opacity-50 hover:!opacity-100 !bottom-4 !left-1/2 !-translate-x-1/2 absolute z-50 px-4 py-2 text-white rounded uppercase font-mono tracking-widest transition-opacity"
-            >
-                Enter VR
-            </button>
+            <VRButton store={xrStore} className="!bg-black/50 !border-0 !text-[9px] !opacity-50 hover:!opacity-100 !bottom-4 !left-1/2 !-translate-x-1/2 absolute z-50 px-4 py-2 text-white rounded uppercase font-mono tracking-widest transition-opacity" />
             
             <KeyboardControls
                 map={[
@@ -246,7 +241,7 @@ export function Scene() {
                         preserveDrawingBuffer: true
                     }}
                 >
-                    <XR store={store}>
+                    <XR store={xrStore}>
                         <color attach="background" args={['#050505']} />
                         
                         <Physics gravity={[0, -9.81, 0]}>
