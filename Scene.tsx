@@ -21,6 +21,16 @@ function CameraController() {
     const subPhase = useStore((s) => s.subPhase);
     const viewMode = useStore((s) => s.viewMode);
 
+    // Increase FOV for Scene 5 (walkthrough mode)
+    useEffect(() => {
+        if (viewMode === 'fps' || chapter === 5) {
+            camera.fov = 75; // Wider FOV for first-person view
+        } else {
+            camera.fov = 45; // Default FOV for orbit view
+        }
+        camera.updateProjectionMatrix();
+    }, [chapter, viewMode, camera]);
+
     useEffect(() => {
         if (viewMode === 'fps') return;
 
@@ -84,24 +94,35 @@ function DynamicLighting() {
     const { sunIntensity, envIntensity, hdriIntensity, sunColor } = useStore();
     const { scene } = useThree();
 
-    // Sync environment intensity (manual for broader compatibility)
+    // Sync environment intensity
     useEffect(() => {
         scene.environmentIntensity = envIntensity;
     }, [envIntensity, scene]);
 
+    // Apply HDRI background intensity
+    useEffect(() => {
+        if (scene.background && scene.background.isTexture) {
+            scene.backgroundIntensity = hdriIntensity;
+        }
+        // Also apply to environment map
+        if (scene.environment) {
+            scene.environmentIntensity = envIntensity * hdriIntensity;
+        }
+    }, [hdriIntensity, envIntensity, scene]);
+
     return (
         <>
-            <Environment 
-                files="https://raw.githubusercontent.com/decentralize-dfw/vea_001/main/RealismHDRI-_equirectangular-jpg_VR360_neon_drenched_skyscrapers_1656103290_10361044.hdr" 
-                background={false} // Don't show background image per user request
+            <Environment
+                files="https://raw.githubusercontent.com/decentralize-dfw/vea_001/main/RealismHDRI-_equirectangular-jpg_VR360_neon_drenched_skyscrapers_1656103290_10361044.hdr"
+                background={false}
                 blur={1}
             />
-            <directionalLight 
-                position={[10, 50, 20]} 
-                intensity={sunIntensity} 
+            <directionalLight
+                position={[10, 50, 20]}
+                intensity={sunIntensity}
                 color={sunColor}
-                castShadow 
-                shadow-bias={-0.0001} 
+                castShadow
+                shadow-bias={-0.0001}
                 shadow-mapSize={[2048, 2048]}
             />
              <AccumulativeShadows temporal frames={60} alphaTest={0.85} opacity={0.7} scale={50} position={[0, -0.01, 0]}>
@@ -136,28 +157,57 @@ function ScreenshotHandler() {
     return null;
 }
 
-function PerformanceMonitor() {
-    const setQuality = useStore(s => s.setQuality);
-    const quality = useStore(s => s.quality);
-    const frames = useRef(0);
-    const lastTime = useRef(performance.now());
+function AutoRotatingOrbitControls() {
+    const chapter = useStore(s => s.currentChapter);
+    const [autoRotate, setAutoRotate] = useState(true);
+    const controlsRef = useRef<any>(null);
 
-    useFrame(() => {
-        frames.current++;
-        const now = performance.now();
-        if (now >= lastTime.current + 2000) {
-            const fps = Math.round((frames.current * 1000) / (now - lastTime.current));
-            if (fps < 30 && quality === 'ultra') {
-                setQuality('high');
-            } else if (fps < 20 && quality === 'high') {
-                setQuality('low');
-            }
-            frames.current = 0;
-            lastTime.current = now;
-        }
-    });
-    return null;
+    // Reset autoRotate to true whenever chapter changes
+    useEffect(() => {
+        setAutoRotate(true);
+    }, [chapter]);
+
+    return (
+        <OrbitControls
+            ref={controlsRef}
+            makeDefault
+            enablePan={false}
+            enableDamping
+            dampingFactor={0.05}
+            autoRotate={autoRotate}
+            autoRotateSpeed={0.25}
+            onChange={() => {
+                // Stop autoRotate on user interaction
+                if (autoRotate) setAutoRotate(false);
+            }}
+        />
+    );
 }
+
+// DISABLED: PerformanceMonitor was auto-downgrading quality, causing user complaints
+// User wants quality to STAY at their selected level (default HIGH)
+// function PerformanceMonitor() {
+//     const setQuality = useStore(s => s.setQuality);
+//     const quality = useStore(s => s.quality);
+//     const frames = useRef(0);
+//     const lastTime = useRef(performance.now());
+
+//     useFrame(() => {
+//         frames.current++;
+//         const now = performance.now();
+//         if (now >= lastTime.current + 2000) {
+//             const fps = Math.round((frames.current * 1000) / (now - lastTime.current));
+//             if (fps < 30 && quality === 'ultra') {
+//                 setQuality('high');
+//             } else if (fps < 20 && quality === 'high') {
+//                 setQuality('low');
+//             }
+//             frames.current = 0;
+//             lastTime.current = now;
+//         }
+//     });
+//     return null;
+// }
 
 function HotspotMarkers() {
     const chapter = useStore(s => s.currentChapter);
@@ -265,19 +315,11 @@ export function Scene() {
                         <HotspotMarkers />
                         
                         {viewMode === 'orbit' && (
-                            <OrbitControls 
-                                makeDefault 
-                                enablePan={false}
-                                enableDamping 
-                                dampingFactor={0.05}
-                                autoRotate={useStore.getState().currentChapter === 0} // Auto rotate only on arrival
-                                autoRotateSpeed={0.25}
-                            />
+                            <AutoRotatingOrbitControls />
                         )}
                         
                         <CameraController />
                         <Effects />
-                        <PerformanceMonitor />
                         <ScreenshotHandler />
                         
                         <BakeShadows />

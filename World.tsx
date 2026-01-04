@@ -90,15 +90,32 @@ export function World() {
             {/* 7. COLLIDER (Physics Only) */}
             {/* Critical: 'trimesh' is needed for complex static geometry so player doesn't fall */}
             {chapter === 5 && (
-                <RigidBody type="fixed" colliders="trimesh">
+                <RigidBody
+                    type="fixed"
+                    colliders="trimesh"
+                    friction={2}
+                    restitution={0}
+                >
                      <primitive object={collider.scene} visible={false} />
                 </RigidBody>
             )}
 
-            {/* Safety Floor */}
-             <RigidBody type="fixed" rotation={[-Math.PI / 2, 0, 0]} position={[0, -10, 0]}>
-                <planeGeometry args={[500, 500]} />
-                <meshBasicMaterial visible={false} />
+            {/* Ground Floor for Walking Mode - Visible support at Y=0 */}
+            {chapter === 5 && (
+                <RigidBody type="fixed" position={[0, 0, 0]} friction={2} restitution={0}>
+                    <mesh receiveShadow>
+                        <boxGeometry args={[100, 0.2, 100]} />
+                        <meshStandardMaterial visible={false} />
+                    </mesh>
+                </RigidBody>
+            )}
+
+            {/* Safety Floor - Fallback at Y=-10 */}
+             <RigidBody type="fixed" position={[0, -10, 0]} friction={2}>
+                <mesh>
+                    <boxGeometry args={[500, 1, 500]} />
+                    <meshBasicMaterial visible={false} />
+                </mesh>
             </RigidBody>
         </group>
     );
