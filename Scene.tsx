@@ -26,10 +26,10 @@ function CameraController() {
 
         // Camera States for each Chapter
         const states = [
-            { pos: [20, 20, 20], target: [0, 0, 0] },     // 0: Arrival
-            { pos: [-20, 30, 20], target: [0, 0, 0] },    // 1: Context (Orbit)
-            { pos: [0, 25, 25], target: [0, 0, 0] },      // 2: Design
-            { pos: [25, 15, -25], target: [0, 5, 0] },    // 3: Structure
+            { pos: [20, 20, 20], target: [0, 0, 0] },     // 0-3: Same position
+            { pos: [20, 20, 20], target: [0, 0, 0] },    // 1: Context
+            { pos: [20, 20, 20], target: [0, 0, 0] },      // 2: Design
+            { pos: [20, 20, 20], target: [0, 0, 0] },    // 3: Structure
         ];
 
         // Interior Camera Angles (Scene 4) - Mapped to subPhase 0-5
@@ -81,7 +81,7 @@ function CameraController() {
 }
 
 function DynamicLighting() {
-    const { sunIntensity, envIntensity, sunColor } = useStore();
+    const { sunIntensity, envIntensity, hdriIntensity, sunColor } = useStore();
     const { scene } = useThree();
 
     // Sync environment intensity (manual for broader compatibility)
@@ -267,10 +267,11 @@ export function Scene() {
                         {viewMode === 'orbit' && (
                             <OrbitControls 
                                 makeDefault 
+                                enablePan={false}
                                 enableDamping 
                                 dampingFactor={0.05}
                                 autoRotate={useStore.getState().currentChapter === 0} // Auto rotate only on arrival
-                                autoRotateSpeed={0.5}
+                                autoRotateSpeed={0.25}
                             />
                         )}
                         
