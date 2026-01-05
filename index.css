@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Telegrama Render - Primary Font */
+@font-face {
+  font-family: 'Telegrama Render';
+  src: url('https://raw.githubusercontent.com/decentralize-dfw/font/main/vea.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
 /* Global Styles */
 body, html {
   margin: 0;
@@ -9,6 +18,7 @@ body, html {
   height: 100%;
   overflow: hidden;
   background: #050505;
+  font-family: 'Telegrama Render', sans-serif;
 }
 
 #root {
@@ -41,15 +51,106 @@ body, html {
   100% { transform: rotate(360deg); }
 }
 
-/* Luxury Font Hierarchy */
-.font-serif {
-  font-family: 'Cinzel', serif;
-}
+/* ===========================================
+   TELEGRAMA RENDER FONT HIERARCHY
+   =========================================== */
 
-.font-sans {
-  font-family: 'Manrope', sans-serif;
-}
-
+/* Primary Font - All elements use Telegrama Render */
+.font-telegrama,
+.font-serif,
+.font-sans,
 .font-mono {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Telegrama Render', sans-serif;
 }
+
+/* Display - Large titles, hero text */
+.font-display {
+  font-family: 'Telegrama Render', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* Heading - Section titles */
+.font-heading {
+  font-family: 'Telegrama Render', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Subheading - Secondary titles */
+.font-subheading {
+  font-family: 'Telegrama Render', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.85em;
+}
+
+/* Body - Regular text content */
+.font-body {
+  font-family: 'Telegrama Render', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+}
+
+/* Caption - Small descriptive text */
+.font-caption {
+  font-family: 'Telegrama Render', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  font-size: 0.75em;
+  opacity: 0.7;
+}
+
+/* Label - UI labels, buttons */
+.font-label {
+  font-family: 'Telegrama Render', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-size: 0.7em;
+}
+
+/* Emphasis - Italic style simulation via letter-spacing */
+.font-emphasis {
+  font-family: 'Telegrama Render', sans-serif;
+  letter-spacing: 0.1em;
+  font-style: italic;
+}
+
+/* Strong - Bold style simulation via letter-spacing */
+.font-strong {
+  font-family: 'Telegrama Render', sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Numeric - Numbers and data */
+.font-numeric {
+  font-family: 'Telegrama Render', sans-serif;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Quote - Pullquotes and testimonials */
+.font-quote {
+  font-family: 'Telegrama Render', sans-serif;
+  letter-spacing: 0.05em;
+  font-style: italic;
+  line-height: 1.8;
+}
+
+/* Override Tailwind defaults */
+* {
+  font-family: 'Telegrama Render', sans-serif;
+}
+
+/* Tracking utilities for hierarchy */
+.tracking-vea-tight { letter-spacing: 0.02em; }
+.tracking-vea-normal { letter-spacing: 0.05em; }
+.tracking-vea-wide { letter-spacing: 0.12em; }
+.tracking-vea-wider { letter-spacing: 0.2em; }
+.tracking-vea-widest { letter-spacing: 0.3em; }
