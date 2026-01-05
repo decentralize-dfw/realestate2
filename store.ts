@@ -6,7 +6,6 @@ export type ViewMode = 'orbit' | 'fps';
 interface ConfigState {
     sunIntensity: number;
     envIntensity: number;
-    hdriIntensity: number; // NEW: HDRI background intensity
     sunColor: string;
     isConfigOpen: boolean;
     toggleConfig: () => void;
@@ -21,7 +20,7 @@ interface AppState extends ConfigState {
     subPhase: number; // For Scene 1 (0-2), Scene 2 (0-1), Scene 4 (0-5)
 
     isMenuOpen: boolean;
-    autoRotateEnabled: boolean; // NEW: User-controlled auto rotation
+    autoRotateEnabled: boolean; // User-controlled auto rotation
     screenshotTrigger: number;
     flashTrigger: number; // Triggers the black fade effect
 
@@ -30,7 +29,7 @@ interface AppState extends ConfigState {
     setChapter: (index: number) => void;
     setSubPhase: (index: number) => void;
     toggleMenu: () => void;
-    toggleAutoRotate: () => void; // NEW: Toggle auto rotation
+    toggleAutoRotate: () => void; // Toggle auto rotation
     triggerScreenshot: () => void;
     triggerFlash: () => void;
 }
@@ -38,7 +37,6 @@ interface AppState extends ConfigState {
 const DEFAULT_CONFIG = {
     sunIntensity: 2.8,
     envIntensity: 0.8,
-    hdriIntensity: 1.0, // NEW: Default HDRI intensity
     sunColor: '#fff9f0'
 };
 
@@ -83,7 +81,7 @@ export const useStore = create<AppState>((set) => ({
 // Curated Experience Chapters
 export const CHAPTER_DATA = [
     {
-        title: 'Ascendance',
+        title: 'Context',
         subtitle: 'Architectural Mastery',
         desc: 'A statement of refinement emerges from the urban landscape—where visionary design transcends convention and redefines contemporary living.',
         detailTitle: 'Design Philosophy',
@@ -91,7 +89,7 @@ export const CHAPTER_DATA = [
         options: []
     },
     {
-        title: 'Context',
+        title: 'Neighbor',
         subtitle: 'Urban Resonance',
         desc: 'Thoughtfully positioned within a distinguished enclave, this residence commands its setting with quiet confidence and timeless presence.',
         detailTitle: 'Contextual Integration',
@@ -99,7 +97,7 @@ export const CHAPTER_DATA = [
         options: ['Surroundings', 'Connectivity', 'Residences']
     },
     {
-        title: 'Expression',
+        title: 'Building',
         subtitle: 'Material Integrity',
         desc: 'Each surface tells a story. Through the careful selection of materials and finishes, form transcends function to become art.',
         detailTitle: 'Crafted Facades',
@@ -107,7 +105,7 @@ export const CHAPTER_DATA = [
         options: ['Luminous Facade', 'Metal Articulation']
     },
     {
-        title: 'Anatomy',
+        title: 'Flats',
         subtitle: 'Structural Poetry',
         desc: 'Beneath the surface lies extraordinary intelligence. A transparent revelation of engineered precision and thoughtful spatial choreography.',
         detailTitle: 'Systems Excellence',
@@ -115,7 +113,7 @@ export const CHAPTER_DATA = [
         options: []
     },
     {
-        title: 'Sanctuaries',
+        title: 'Panorama',
         subtitle: 'Refined Interiors',
         desc: 'Expansive volumes bathed in natural light. Every space orchestrated for comfort, elegance, and the quiet luxury of daily ritual.',
         detailTitle: 'Curated Living',

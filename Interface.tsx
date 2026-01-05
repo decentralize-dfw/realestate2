@@ -12,7 +12,7 @@ export function Interface() {
         autoRotateEnabled, toggleAutoRotate,
         triggerScreenshot,
         isConfigOpen, toggleConfig,
-        sunIntensity, envIntensity, hdriIntensity, sunColor, updateConfig, resetConfig,
+        sunIntensity, envIntensity, sunColor, updateConfig, resetConfig,
         flashTrigger
     } = useStore();
 
@@ -239,18 +239,6 @@ export function Interface() {
                             </div>
                             <div>
                                 <label className="block text-white/50 mb-3 uppercase tracking-[0.15em] font-light">
-                            <div>
-                                <label className="flex justify-between text-white/50 mb-3 uppercase tracking-[0.15em] font-light">
-                                    <span>HDRI Intensity</span>
-                                    <span className="text-emerald-400 font-medium">{hdriIntensity.toFixed(1)}</span>
-                                </label>
-                                <input
-                                    type="range" min="0" max="1" step="0.1"
-                                    value={hdriIntensity}
-                                    onChange={(e) => updateConfig("hdriIntensity", parseFloat(e.target.value))}
-                                    className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-emerald-400 hover:bg-white/15 transition-colors"
-                                />
-                            </div>
                                     Light Temperature
                                 </label>
                                 <input
@@ -273,7 +261,7 @@ export function Interface() {
             </AnimatePresence>
 
             {/* --- CHAPTER NAVIGATION - ENLARGED WITH HOVER NAMES --- */}
-            <div className="absolute right-8 top-2/3 -translate-y-1/2 flex flex-col gap-6 pointer-events-auto">
+            <div className="absolute right-8 top-1/2 -translate-y-1/2 flex flex-col gap-6 pointer-events-auto">
                 {CHAPTER_DATA.map((chap, idx) => (
                     <button
                         key={idx}
