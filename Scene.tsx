@@ -264,12 +264,8 @@ function HotspotMarkers() {
 export function Scene() {
     const quality = useStore((s) => s.quality);
     const viewMode = useStore((s) => s.viewMode);
-    const currentChapter = useStore((s) => s.currentChapter);
 
-    const dpr = quality === 'low' ? 0.8 : quality === 'high' ? 1 : 1.5; // Adjusted DPR logic for "Low"
-
-    // Scenes 0-3: Orthographic, Scenes 4-5: Perspective
-    const isPerspective = currentChapter >= 4;
+    const dpr = quality === 'low' ? 0.8 : quality === 'high' ? 1 : 1.5;
 
     return (
         <>
@@ -292,21 +288,12 @@ export function Scene() {
                     id="canvas-container"
                     shadows
                     dpr={dpr}
-                    orthographic={!isPerspective}
-                    camera={isPerspective
-                        ? {
-                            position: [20, 20, 20],
-                            fov: 90, // HTML-matched: Scene 4 & 5 use FOV 90
-                            near: 0.1,
-                            far: 1000
-                        }
-                        : {
-                            position: [20, 20, 20],
-                            zoom: 50,
-                            near: 0.1,
-                            far: 1000
-                        }
-                    }
+                    camera={{
+                        position: [20, 20, 20],
+                        fov: 45,
+                        near: 0.1,
+                        far: 1000
+                    }}
                     gl={{
                         powerPreference: 'high-performance',
                         antialias: false,
