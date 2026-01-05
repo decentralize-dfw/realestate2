@@ -1,4 +1,4 @@
-import { EffectComposer, Bloom, SSAO, Noise, Vignette, ToneMapping } from '@react-three/postprocessing';
+import { EffectComposer, Bloom, SSAO, Noise, Vignette, ToneMapping, ChromaticAberration, DepthOfField } from '@react-three/postprocessing';
 import { useStore } from './store';
 import { BlendFunction } from 'postprocessing';
 
@@ -10,29 +10,53 @@ export function Effects() {
 
     return (
         <EffectComposer disableNormalPass={false} multisampling={quality === 'ultra' ? 8 : 4}>
-            {/* Cinematic Glow - Mipmap blur for 'Unreal' soft bloom */}
-            <Bloom 
-                luminanceThreshold={1.1} 
-                mipmapBlur 
-                intensity={0.4} 
-                radius={0.6} 
-            />
-            
-            {/* Realistic Ambient Occlusion (Corners) - Ultra only */}
-            {quality === 'ultra' && (
-                <SSAO 
-                    blendFunction={BlendFunction.MULTIPLY} 
-                    samples={30} 
-                    radius={0.05} 
-                    intensity={15} 
+            {/* ULTRA Mode: Dramatic cinematic bloom */}
+            {quality === 'ultra' ? (
+                <Bloom
+                    luminanceThreshold={0.9}
+                    mipmapBlur
+                    intensity={0.8}
+                    radius={0.85}
+                    levels={8}
+                />
+            ) : (
+                <Bloom
+                    luminanceThreshold={1.1}
+                    mipmapBlur
+                    intensity={0.4}
+                    radius={0.6}
                 />
             )}
 
-            {/* Film Grain & Vignette for Cinematic Look */}
-            <Noise opacity={0.025} />
-            <Vignette eskil={false} offset={0.1} darkness={0.9} />
-            
-            {/* Tone Mapping handled by Canvas, but can be augmented here if needed */}
+            {/* ULTRA Mode: Realistic Ambient Occlusion for depth */}
+            {quality === 'ultra' && (
+                <SSAO
+                    blendFunction={BlendFunction.MULTIPLY}
+                    samples={50}
+                    radius={0.08}
+                    intensity={25}
+                    luminanceInfluence={0.6}
+                    bias={0.025}
+                />
+            )}
+
+            {/* ULTRA Mode: Chromatic aberration for premium lens effect */}
+            {quality === 'ultra' && (
+                <ChromaticAberration
+                    blendFunction={BlendFunction.NORMAL}
+                    offset={[0.0015, 0.0015]}
+                />
+            )}
+
+            {/* Film Grain - Stronger on ULTRA */}
+            <Noise opacity={quality === 'ultra' ? 0.035 : 0.025} />
+
+            {/* Vignette - Darker on ULTRA for cinematic look */}
+            <Vignette
+                eskil={false}
+                offset={quality === 'ultra' ? 0.15 : 0.1}
+                darkness={quality === 'ultra' ? 1.0 : 0.9}
+            />
         </EffectComposer>
     );
 }

@@ -72,9 +72,12 @@ export function Player() {
                 position={[1.4, 3, -0.6]}
                 enabledRotations={[false, false, false]}
                 linearDamping={8}
-                friction={1}
+                friction={2}
+                restitution={0}
+                gravityScale={1}
+                lockRotations
             >
-                <CapsuleCollider args={[0.6, 0.35]} />
+                <CapsuleCollider args={[0.6, 0.35]} friction={2} restitution={0} />
             </RigidBody>
         </group>
     );
