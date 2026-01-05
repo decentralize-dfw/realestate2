@@ -67,12 +67,11 @@ export function World() {
     const s2_opt0 = chapter === 2 && subPhase === 0;
     const s2_opt1 = chapter === 2 && subPhase === 1;
 
-    // Scene 3 (Structure): Ghost(1) + Surround(5) (Ref: Ghost view)
+    // Scene 3 (Flats/Anatomy): Ghost(1) + Surround(5) + Metal(2) (Ref: Ghost view with metal)
     const s3 = chapter === 3;
 
-    // Scene 4 & 5 (Interior): Interior(6) + Metal(2)
+    // Scene 4 & 5 (Interior): Interior(6)
     const s4_5 = chapter === 4 || chapter === 5;
-    const s4_metal = chapter === 4; // Show metal model in Scene 4
 
     return (
         <group>
@@ -83,7 +82,7 @@ export function World() {
             <primitive object={ghost.scene} visible={s3} /> {/* Ghost for Anatomy */}
 
             {/* 2. METAL */}
-            <primitive object={metal.scene} visible={s2_opt1 || s4_metal} />
+            <primitive object={metal.scene} visible={s2_opt1 || s3} />
 
             {/* 3. WHITE FACADE */}
             <primitive object={white.scene} visible={s2_opt0} />

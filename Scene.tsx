@@ -20,6 +20,7 @@ function CameraController() {
     const chapter = useStore((s) => s.currentChapter);
     const subPhase = useStore((s) => s.subPhase);
     const viewMode = useStore((s) => s.viewMode);
+    const cameraSetFor0to3 = useRef(false); // Track if camera was set for scenes 0-3
 
     // Adjust FOV for Scene 5 (walkthrough mode) - REDUCED to minimize zoom
     useEffect(() => {
@@ -33,14 +34,6 @@ function CameraController() {
 
     useEffect(() => {
         if (viewMode === 'fps') return;
-
-        // Camera States for each Chapter - SCENES 0-3 STAY AT SAME POSITION (NO ANIMATION)
-        const states = [
-            { pos: [20, 20, 20], target: [0, 0, 0] },     // 0-3: Same position
-            { pos: [20, 20, 20], target: [0, 0, 0] },
-            { pos: [20, 20, 20], target: [0, 0, 0] },
-            { pos: [20, 20, 20], target: [0, 0, 0] },
-        ];
 
         // Interior Camera Angles (Scene 4) - Mapped to subPhase 0-5
         const interiorCams = [
@@ -63,23 +56,25 @@ function CameraController() {
                 // @ts-ignore
                 controls.update();
             }
+            cameraSetFor0to3.current = false; // Reset flag when leaving scenes 0-3
         } else if (chapter <= 3) {
-            // NO ANIMATION for scenes 0-3 - instant position
-            const state = states[chapter] || states[0];
-            camera.position.set(state.pos[0], state.pos[1], state.pos[2]);
-            camera.lookAt(state.target[0], state.target[1], state.target[2]);
+            // SCENES 0-3: Set camera position ONLY ONCE, never reset between these scenes
+            if (!cameraSetFor0to3.current) {
+                camera.position.set(20, 20, 20);
+                camera.lookAt(0, 0, 0);
 
-            if (controls) {
-                // @ts-ignore
-                controls.target.set(state.target[0], state.target[1], state.target[2]);
-                // @ts-ignore
-                controls.update();
+                if (controls) {
+                    // @ts-ignore
+                    controls.target.set(0, 0, 0);
+                    // @ts-ignore
+                    controls.update();
+                }
+                cameraSetFor0to3.current = true; // Mark as set
             }
-        } else {
-            // For other scenes (Scene 5+), maintain default behavior
-            const state = states[chapter] || states[0];
-            camera.position.set(state.pos[0], state.pos[1], state.pos[2]);
-            camera.lookAt(state.target[0], state.target[1], state.target[2]);
+            // If already set, DO NOTHING - camera stays where user left it
+        } else if (chapter === 5) {
+            // Scene 5 uses FPS mode, no orbit camera positioning needed
+            cameraSetFor0to3.current = false;
         }
     }, [chapter, subPhase, viewMode, camera, controls]);
 
@@ -87,7 +82,7 @@ function CameraController() {
 }
 
 function DynamicLighting() {
-    const { sunIntensity, envIntensity, hdriIntensity, sunColor, quality } = useStore();
+    const { sunIntensity, envIntensity, sunColor, quality } = useStore();
     const { scene } = useThree();
 
     // Select HDRI based on quality - ULTRA uses studio lighting
@@ -100,17 +95,6 @@ function DynamicLighting() {
         scene.environmentIntensity = envIntensity;
     }, [envIntensity, scene]);
 
-    // Apply HDRI background intensity
-    useEffect(() => {
-        if (scene.background && scene.background.isTexture) {
-            scene.backgroundIntensity = hdriIntensity;
-        }
-        // Also apply to environment map
-        if (scene.environment) {
-            scene.environmentIntensity = envIntensity * hdriIntensity;
-        }
-    }, [hdriIntensity, envIntensity, scene]);
-
     return (
         <>
             <Environment
@@ -118,9 +102,10 @@ function DynamicLighting() {
                 background={false}
                 blur={quality === 'ultra' ? 0.5 : 1}
             />
+            <ambientLight intensity={quality === 'ultra' ? 0.8 : 0.5} />
             <directionalLight
                 position={[10, 50, 20]}
-                intensity={sunIntensity}
+                intensity={quality === 'ultra' ? sunIntensity * 1.5 : sunIntensity}
                 color={sunColor}
                 castShadow
                 shadow-bias={-0.0001}
@@ -160,7 +145,25 @@ function ScreenshotHandler() {
 
 function AutoRotatingOrbitControls() {
     const autoRotateEnabled = useStore(s => s.autoRotateEnabled);
+    const toggleAutoRotate = useStore(s => s.toggleAutoRotate);
     const controlsRef = useRef<any>(null);
+    const userInteractedRef = useRef(false);
+
+    // Listen for user interaction with controls
+    const handleControlsChange = () => {
+        // If autoRotate is ON and user interacts, turn it OFF automatically
+        if (autoRotateEnabled && !userInteractedRef.current) {
+            userInteractedRef.current = true;
+            toggleAutoRotate(); // Turn OFF
+        }
+    };
+
+    // Reset interaction flag when autoRotate is manually toggled back ON
+    useEffect(() => {
+        if (autoRotateEnabled) {
+            userInteractedRef.current = false;
+        }
+    }, [autoRotateEnabled]);
 
     return (
         <OrbitControls
@@ -171,6 +174,7 @@ function AutoRotatingOrbitControls() {
             dampingFactor={0.05}
             autoRotate={autoRotateEnabled}
             autoRotateSpeed={0.25}
+            onChange={handleControlsChange}
         />
     );
 }
