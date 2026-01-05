@@ -85,10 +85,9 @@ function DynamicLighting() {
     const { sunIntensity, envIntensity, sunColor, quality } = useStore();
     const { scene } = useThree();
 
-    // Select HDRI based on quality - ULTRA uses studio lighting
-    const hdriFile = quality === 'ultra'
-        ? "https://raw.githubusercontent.com/decentralize-dfw/vea-randomfiles/main/studio_small_09_2k.hdr"
-        : "https://raw.githubusercontent.com/decentralize-dfw/vea_001/main/RealismHDRI-_equirectangular-jpg_VR360_neon_drenched_skyscrapers_1656103290_10361044.hdr";
+    // CRITICAL: Use SAME HDRI for both HIGH and ULTRA (user requirement)
+    // ULTRA differentiation comes from boosted post-processing (SSAO/Bloom)
+    const hdriFile = "https://raw.githubusercontent.com/decentralize-dfw/vea_001/main/RealismHDRI-_equirectangular-jpg_VR360_neon_drenched_skyscrapers_1656103290_10361044.hdr";
 
     // Sync environment intensity
     useEffect(() => {
@@ -149,16 +148,16 @@ function AutoRotatingOrbitControls() {
     const controlsRef = useRef<any>(null);
     const userInteractedRef = useRef(false);
 
-    // Listen for user interaction with controls
-    const handleControlsChange = () => {
-        // If autoRotate is ON and user interacts, turn it OFF automatically
+    // Listen for user interaction with controls (onStart only fires on user drag, not auto-rotation)
+    const handleUserInteraction = () => {
+        // If autoRotate is ON and this is the first user interaction, turn it OFF automatically
         if (autoRotateEnabled && !userInteractedRef.current) {
             userInteractedRef.current = true;
-            toggleAutoRotate(); // Turn OFF
+            toggleAutoRotate(); // Turn OFF on first user drag
         }
     };
 
-    // Reset interaction flag when autoRotate is manually toggled back ON
+    // Reset interaction flag when autoRotate is manually toggled back ON via footer button
     useEffect(() => {
         if (autoRotateEnabled) {
             userInteractedRef.current = false;
@@ -174,7 +173,7 @@ function AutoRotatingOrbitControls() {
             dampingFactor={0.05}
             autoRotate={autoRotateEnabled}
             autoRotateSpeed={0.25}
-            onChange={handleControlsChange}
+            onStart={handleUserInteraction}
         />
     );
 }
@@ -264,8 +263,12 @@ function HotspotMarkers() {
 export function Scene() {
     const quality = useStore((s) => s.quality);
     const viewMode = useStore((s) => s.viewMode);
+    const currentChapter = useStore((s) => s.currentChapter);
 
     const dpr = quality === 'low' ? 0.8 : quality === 'high' ? 1 : 1.5; // Adjusted DPR logic for "Low"
+
+    // Scenes 0-3: Orthographic, Scenes 4-5: Perspective
+    const isPerspective = currentChapter >= 4;
 
     return (
         <>
@@ -273,7 +276,7 @@ export function Scene() {
                 store={xrStore}
                 className="!bg-gradient-to-br !from-black/70 !via-black/60 !to-black/70 !backdrop-blur-xl !border !border-white/20 !text-[9px] !opacity-60 hover:!opacity-100 hover:!border-emerald-400/50 hover:!shadow-[0_0_20px_rgba(52,211,153,0.3)] !bottom-6 !left-1/2 !-translate-x-1/2 !absolute !z-50 !px-6 !py-3 !text-white/80 hover:!text-white !rounded-lg !uppercase !font-mono !tracking-[0.25em] !transition-all !duration-300 !font-light"
             />
-            
+
             <KeyboardControls
                 map={[
                     { name: 'forward', keys: ['ArrowUp', 'w', 'W'] },
@@ -288,13 +291,21 @@ export function Scene() {
                     id="canvas-container"
                     shadows
                     dpr={dpr}
-                    orthographic
-                    camera={{
-                        position: [20, 20, 20],
-                        zoom: 50,
-                        near: 0.1,
-                        far: 1000
-                    }}
+                    orthographic={!isPerspective}
+                    camera={isPerspective
+                        ? {
+                            position: [20, 20, 20],
+                            fov: 50,
+                            near: 0.1,
+                            far: 1000
+                        }
+                        : {
+                            position: [20, 20, 20],
+                            zoom: 50,
+                            near: 0.1,
+                            far: 1000
+                        }
+                    }
                     gl={{
                         powerPreference: 'high-performance',
                         antialias: false,
