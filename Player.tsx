@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useKeyboardControls, PointerLockControls } from '@react-three/drei';
-import { CapsuleCollider, RigidBody, RapierRigidBody, useRapier } from '@react-three/rapier';
 import { useStore } from './store';
 
 // HTML-matched physics configuration
@@ -18,12 +17,10 @@ const frontVector = new THREE.Vector3();
 const sideVector = new THREE.Vector3();
 
 export function Player() {
-    const rigidBody = useRef<RapierRigidBody>(null);
     const { camera, scene } = useThree();
     const [, get] = useKeyboardControls();
     const viewMode = useStore((s) => s.viewMode);
     const chapter = useStore((s) => s.currentChapter);
-    const { rapier, world } = useRapier();
 
     const [playerOnFloor, setPlayerOnFloor] = useState(false);
     const [currentMoveSpeed, setCurrentMoveSpeed] = useState(BASE_MOVE_SPEED);
@@ -43,7 +40,7 @@ export function Player() {
     });
 
     useFrame((state, delta) => {
-        if (!rigidBody.current || viewMode !== 'fps' || chapter !== 5) return;
+        if (viewMode !== 'fps' || chapter !== 5) return;
 
         const { forward, backward, left, right, jump, sprint } = get();
 
