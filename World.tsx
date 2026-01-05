@@ -32,23 +32,38 @@ export function World() {
     const interior = useGLTF(MODELS.interior);
     const collider = useGLTF(MODELS.collider);
 
-    // Apply Shadows
+    // Apply Shadows DYNAMICALLY based on chapter
+    // CRITICAL: In Three.js, visible=false does NOT prevent shadow casting!
+    // We must explicitly disable castShadow on invisible models to prevent ghost shadows
     useEffect(() => {
-        [city, ghost, metal, white, normal, surround, interior].forEach(gltf => {
+        const isInteriorScene = chapter === 4 || chapter === 5;
+
+        // Interior model - cast shadows only in interior scenes
+        interior.scene.traverse((o) => {
+            if (o instanceof THREE.Mesh) {
+                o.castShadow = isInteriorScene;
+                o.receiveShadow = true;
+            }
+        });
+
+        // Outdoor models - cast shadows only in outdoor scenes
+        [city, ghost, metal, white, normal, surround].forEach(gltf => {
             gltf.scene.traverse((o) => {
                 if (o instanceof THREE.Mesh) {
-                    o.castShadow = true;
+                    o.castShadow = !isInteriorScene;
                     o.receiveShadow = true;
                 }
             });
         });
-    }, [city, ghost, metal, white, normal, surround, interior]);
+    }, [chapter, city, ghost, metal, white, normal, surround, interior]);
 
-    // Mark collider meshes for raycasting
+    // Mark collider meshes for raycasting - NEVER cast shadows
     useEffect(() => {
         collider.scene.traverse((child) => {
             if (child instanceof THREE.Mesh) {
                 child.userData.isCollider = true;
+                child.castShadow = false; // Colliders should never cast shadows
+                child.receiveShadow = false;
             }
         });
     }, [collider]);
