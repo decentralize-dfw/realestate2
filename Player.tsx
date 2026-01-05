@@ -106,6 +106,9 @@ export function Player() {
 
         camera.position.y = playerPos.y;
 
+        // CRITICAL: Prevent camera from going underground (Y minimum = 0)
+        camera.position.y = Math.max(0, camera.position.y);
+
         // Wall collision detection
         const checkPos = new THREE.Vector3(camera.position.x, camera.position.y - PLAYER_HEIGHT / 2, camera.position.z);
         const directions = [

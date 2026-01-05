@@ -10,14 +10,14 @@ export function Effects() {
 
     return (
         <EffectComposer disableNormalPass={false} multisampling={quality === 'ultra' ? 8 : 4}>
-            {/* ULTRA Mode: Premium studio lighting with subtle bloom */}
+            {/* ULTRA Mode: BOOSTED bloom for dramatic effect (user requirement) */}
             {quality === 'ultra' ? (
                 <Bloom
-                    luminanceThreshold={1.0}
+                    luminanceThreshold={0.8}
                     mipmapBlur
-                    intensity={0.5}
-                    radius={0.7}
-                    levels={6}
+                    intensity={1.2}
+                    radius={0.9}
+                    levels={8}
                 />
             ) : (
                 <Bloom
@@ -28,13 +28,13 @@ export function Effects() {
                 />
             )}
 
-            {/* ULTRA Mode: Realistic Ambient Occlusion for depth */}
+            {/* ULTRA Mode: BOOSTED SSAO for enhanced depth (user requirement) */}
             {quality === 'ultra' && (
                 <SSAO
                     blendFunction={BlendFunction.MULTIPLY}
-                    samples={50}
-                    radius={0.08}
-                    intensity={20}
+                    samples={64}
+                    radius={0.12}
+                    intensity={40}
                     luminanceInfluence={0.6}
                     bias={0.025}
                 />
