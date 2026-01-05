@@ -296,7 +296,7 @@ export function Scene() {
                     camera={isPerspective
                         ? {
                             position: [20, 20, 20],
-                            fov: 50,
+                            fov: 90, // HTML-matched: Scene 4 & 5 use FOV 90
                             near: 0.1,
                             far: 1000
                         }
