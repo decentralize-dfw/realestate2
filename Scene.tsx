@@ -102,10 +102,16 @@ function DynamicLighting() {
     // ULTRA differentiation comes from boosted post-processing (SSAO/Bloom)
     const hdriFile = "https://raw.githubusercontent.com/decentralize-dfw/vea_001/main/RealismHDRI-_equirectangular-jpg_VR360_neon_drenched_skyscrapers_1656103290_10361044.hdr";
 
+    // Scene-specific lighting defaults
+    // Interior scenes (4 & 5): No directional light, full HDRI
+    const isInterior = chapter === 4 || chapter === 5;
+    const effectiveSunIntensity = isInterior ? 0 : sunIntensity;
+    const effectiveEnvIntensity = isInterior ? 2.0 : envIntensity;
+
     // Sync environment intensity
     useEffect(() => {
-        scene.environmentIntensity = envIntensity;
-    }, [envIntensity, scene]);
+        scene.environmentIntensity = effectiveEnvIntensity;
+    }, [effectiveEnvIntensity, scene]);
 
     return (
         <>
@@ -114,14 +120,21 @@ function DynamicLighting() {
                 background={false}
                 blur={quality === 'ultra' ? 0.5 : 1}
             />
-            <ambientLight intensity={quality === 'ultra' ? 0.8 : 0.5} />
+            <ambientLight intensity={isInterior ? 1.2 : (quality === 'ultra' ? 0.8 : 0.5)} />
             <directionalLight
                 position={[10, 50, 20]}
-                intensity={quality === 'ultra' ? sunIntensity * 1.5 : sunIntensity}
+                intensity={quality === 'ultra' ? effectiveSunIntensity * 1.5 : effectiveSunIntensity}
                 color={sunColor}
-                castShadow
-                shadow-bias={-0.0001}
-                shadow-mapSize={[2048, 2048]}
+                castShadow={!isInterior}
+                shadow-bias={quality === 'ultra' ? -0.00005 : -0.0001}
+                shadow-normalBias={quality === 'ultra' ? 0.02 : 0.01}
+                shadow-mapSize={quality === 'ultra' ? [4096, 4096] : [2048, 2048]}
+                shadow-camera-near={0.1}
+                shadow-camera-far={100}
+                shadow-camera-left={-30}
+                shadow-camera-right={30}
+                shadow-camera-top={30}
+                shadow-camera-bottom={-30}
             />
             {/* AccumulativeShadows ONLY for outdoor scenes (0-3) - causes weird shadows in interior */}
             {chapter <= 3 && (
@@ -191,6 +204,11 @@ function AutoRotatingOrbitControls() {
             autoRotate={autoRotateEnabled}
             autoRotateSpeed={0.25}
             enableZoom={chapter !== 4} // Scene 4: Disable zoom (camera stays fixed)
+            // Zoom limits for Scene 0-3: prevent going too close or below ground
+            minDistance={chapter <= 3 ? 18 : 1}  // Min zoom distance (can't go closer than 18 units)
+            maxDistance={chapter <= 3 ? 60 : 100}  // Max zoom distance
+            maxPolarAngle={chapter <= 3 ? Math.PI / 2.1 : Math.PI}  // Prevent camera going below ground (horizon limit)
+            minPolarAngle={chapter <= 3 ? 0.2 : 0}  // Prevent looking from directly above
             onStart={handleUserInteraction}
         />
     );
