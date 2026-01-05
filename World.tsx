@@ -44,6 +44,15 @@ export function World() {
         });
     }, [city, ghost, metal, white, normal, surround, interior]);
 
+    // Mark collider meshes for raycasting
+    useEffect(() => {
+        collider.scene.traverse((child) => {
+            if (child instanceof THREE.Mesh) {
+                child.userData.isCollider = true;
+            }
+        });
+    }, [collider]);
+
     // --- VISIBILITY LOGIC ---
     
     // Scene 0 (Arrival): Show City(0) + Normal(4)
@@ -61,8 +70,9 @@ export function World() {
     // Scene 3 (Structure): Ghost(1) + Surround(5) (Ref: Ghost view)
     const s3 = chapter === 3;
 
-    // Scene 4 & 5 (Interior): Interior(6)
+    // Scene 4 & 5 (Interior): Interior(6) + Metal(2)
     const s4_5 = chapter === 4 || chapter === 5;
+    const s4_metal = chapter === 4; // Show metal model in Scene 4
 
     return (
         <group>
@@ -73,7 +83,7 @@ export function World() {
             <primitive object={ghost.scene} visible={s3} /> {/* Ghost for Anatomy */}
 
             {/* 2. METAL */}
-            <primitive object={metal.scene} visible={s2_opt1} />
+            <primitive object={metal.scene} visible={s2_opt1 || s4_metal} />
 
             {/* 3. WHITE FACADE */}
             <primitive object={white.scene} visible={s2_opt0} />
@@ -87,36 +97,24 @@ export function World() {
             {/* 6. INTERIOR */}
             <primitive object={interior.scene} visible={s4_5} />
 
-            {/* 7. COLLIDER (Physics Only) */}
-            {/* Critical: 'trimesh' is needed for complex static geometry so player doesn't fall */}
+            {/* 7. COLLIDER (Physics Only) - HTML-matched setup */}
             {chapter === 5 && (
-                <RigidBody
-                    type="fixed"
-                    colliders="trimesh"
-                    friction={2}
-                    restitution={0}
-                >
-                     <primitive object={collider.scene} visible={false} />
-                </RigidBody>
+                <primitive object={collider.scene} visible={false} />
             )}
 
-            {/* Ground Floor for Walking Mode - Visible support at Y=0 */}
+            {/* Ground Floor for Walking Mode */}
             {chapter === 5 && (
-                <RigidBody type="fixed" position={[0, 0, 0]} friction={2} restitution={0}>
-                    <mesh receiveShadow>
-                        <boxGeometry args={[100, 0.2, 100]} />
-                        <meshStandardMaterial visible={false} />
-                    </mesh>
-                </RigidBody>
-            )}
-
-            {/* Safety Floor - Fallback at Y=-10 */}
-             <RigidBody type="fixed" position={[0, -10, 0]} friction={2}>
-                <mesh>
-                    <boxGeometry args={[500, 1, 500]} />
-                    <meshBasicMaterial visible={false} />
+                <mesh position={[0, 0, 0]} receiveShadow userData={{ isCollider: true }}>
+                    <boxGeometry args={[100, 0.2, 100]} />
+                    <meshStandardMaterial visible={false} />
                 </mesh>
-            </RigidBody>
+            )}
+
+            {/* Safety Floor - Fallback */}
+            <mesh position={[0, -10, 0]} userData={{ isCollider: true }}>
+                <boxGeometry args={[500, 1, 500]} />
+                <meshBasicMaterial visible={false} />
+            </mesh>
         </group>
     );
 }

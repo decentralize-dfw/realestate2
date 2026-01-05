@@ -21,6 +21,7 @@ interface AppState extends ConfigState {
     subPhase: number; // For Scene 1 (0-2), Scene 2 (0-1), Scene 4 (0-5)
 
     isMenuOpen: boolean;
+    autoRotateEnabled: boolean; // NEW: User-controlled auto rotation
     screenshotTrigger: number;
     flashTrigger: number; // Triggers the black fade effect
 
@@ -29,6 +30,7 @@ interface AppState extends ConfigState {
     setChapter: (index: number) => void;
     setSubPhase: (index: number) => void;
     toggleMenu: () => void;
+    toggleAutoRotate: () => void; // NEW: Toggle auto rotation
     triggerScreenshot: () => void;
     triggerFlash: () => void;
 }
@@ -46,6 +48,7 @@ export const useStore = create<AppState>((set) => ({
     currentChapter: 0,
     subPhase: 0,
     isMenuOpen: true,
+    autoRotateEnabled: true, // NEW: Start with auto-rotate ON
     screenshotTrigger: 0,
     flashTrigger: 0,
 
@@ -68,9 +71,10 @@ export const useStore = create<AppState>((set) => ({
     }),
     setSubPhase: (index) => set({ subPhase: index }),
     toggleMenu: () => set((state) => ({ isMenuOpen: !state.isMenuOpen })),
+    toggleAutoRotate: () => set((state) => ({ autoRotateEnabled: !state.autoRotateEnabled })), // NEW
     triggerScreenshot: () => set((state) => ({ screenshotTrigger: state.screenshotTrigger + 1 })),
     triggerFlash: () => set((state) => ({ flashTrigger: state.flashTrigger + 1 })),
-    
+
     toggleConfig: () => set((state) => ({ isConfigOpen: !state.isConfigOpen })),
     updateConfig: (key, value) => set({ [key]: value }),
     resetConfig: () => set({ ...DEFAULT_CONFIG })
