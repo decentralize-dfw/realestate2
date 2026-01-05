@@ -22,10 +22,10 @@ function CameraController() {
     const viewMode = useStore((s) => s.viewMode);
     const cameraSetFor0to3 = useRef(false); // Track if camera was set for scenes 0-3
 
-    // Adjust FOV for Scene 5 (walkthrough mode) - REDUCED to minimize zoom
+    // HTML-matched FOV: Scene 4 & 5 use FOV 90
     useEffect(() => {
-        if (viewMode === 'fps' || chapter === 5) {
-            camera.fov = 50; // Reduced FOV to see more (less zoom)
+        if (chapter === 4 || chapter === 5 || viewMode === 'fps') {
+            camera.fov = 90; // HTML uses 90 for interior and walkthrough
         } else {
             camera.fov = 45; // Default FOV for orbit view
         }
@@ -73,7 +73,8 @@ function CameraController() {
             }
             // If already set, DO NOTHING - camera stays where user left it
         } else if (chapter === 5) {
-            // Scene 5 uses FPS mode, no orbit camera positioning needed
+            // Scene 5: HTML-matched initial position for walkthrough
+            camera.position.set(1.4, 1.6, -0.6);
             cameraSetFor0to3.current = false;
         }
     }, [chapter, subPhase, viewMode, camera, controls]);
