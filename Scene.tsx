@@ -281,6 +281,7 @@ function HotspotMarkers() {
 export function Scene() {
     const quality = useStore((s) => s.quality);
     const viewMode = useStore((s) => s.viewMode);
+    const chapter = useStore((s) => s.currentChapter);
 
     const dpr = quality === 'low' ? 0.8 : quality === 'high' ? 1 : 1.5;
 
@@ -339,7 +340,9 @@ export function Scene() {
                         <Effects />
                         <ScreenshotHandler />
                         
-                        <BakeShadows />
+                        {/* BakeShadows only for outdoor scenes - freezes shadow map which causes
+                            phantom shadows in interior scenes when outdoor models are invisible */}
+                        {chapter <= 3 && <BakeShadows />}
                         <Preload all />
                     </XR>
                 </Canvas>
