@@ -4,11 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useProgress } from '@react-three/drei';
 
 export function Interface() {
-    const { 
-        currentChapter, setChapter, 
+    const {
+        currentChapter, setChapter,
         subPhase, setSubPhase,
-        quality, setQuality, 
+        quality, setQuality,
         viewMode, setViewMode,
+        autoRotateEnabled, toggleAutoRotate,
         triggerScreenshot,
         isConfigOpen, toggleConfig,
         sunIntensity, envIntensity, hdriIntensity, sunColor, updateConfig, resetConfig,
@@ -271,8 +272,8 @@ export function Interface() {
                 )}
             </AnimatePresence>
 
-            {/* --- CHAPTER NAVIGATION --- */}
-            <div className="absolute right-8 top-2/3 -translate-y-1/2 flex flex-col gap-5 pointer-events-auto">
+            {/* --- CHAPTER NAVIGATION - ENLARGED WITH HOVER NAMES --- */}
+            <div className="absolute right-8 top-2/3 -translate-y-1/2 flex flex-col gap-6 pointer-events-auto">
                 {CHAPTER_DATA.map((chap, idx) => (
                     <button
                         key={idx}
@@ -281,19 +282,20 @@ export function Interface() {
                             if(idx === 5) setViewMode('fps');
                             else setViewMode('orbit');
                         }}
-                        className="group flex items-center justify-end gap-4 relative"
+                        className="group flex items-center justify-end gap-5 relative"
                     >
-                        <span className={`text-[9px] uppercase tracking-[0.25em] font-mono transition-all duration-500 ease-out font-light ${
+                        {/* Show number when active, show name on hover */}
+                        <span className={`text-xs uppercase tracking-[0.2em] font-mono transition-all duration-500 ease-out font-light whitespace-nowrap ${
                             currentChapter === idx
                                 ? 'opacity-100 text-emerald-400 font-medium'
-                                : 'opacity-0 -translate-x-3 group-hover:opacity-80 group-hover:translate-x-0 text-white/60'
+                                : 'opacity-0 -translate-x-4 group-hover:opacity-90 group-hover:translate-x-0 text-white/70'
                         }`}>
-                            {String(idx + 1).padStart(2, '0')}
+                            {currentChapter === idx ? String(idx + 1).padStart(2, '0') : chap.title}
                         </span>
-                        <div className={`w-2 h-2 border rotate-45 transition-all duration-500 ${
+                        <div className={`w-3 h-3 border rotate-45 transition-all duration-500 ${
                             currentChapter === idx
-                                ? 'bg-emerald-400 border-emerald-400 scale-[1.6] shadow-[0_0_12px_rgba(52,211,153,0.6)]'
-                                : 'border-white/25 hover:border-white/70 hover:scale-125 bg-transparent'
+                                ? 'bg-emerald-400 border-emerald-400 scale-[1.8] shadow-[0_0_15px_rgba(52,211,153,0.7)]'
+                                : 'border-white/30 hover:border-white/80 hover:scale-150 bg-transparent'
                         }`}></div>
                     </button>
                 ))}
@@ -310,6 +312,22 @@ export function Interface() {
                         <span className="text-emerald-400/70 text-[9px] tracking-[0.3em]">CHAPTER</span>
                         <span className="text-white/60">{String(currentChapter + 1).padStart(2, '0')} / 06</span>
                      </div>
+                     {/* AutoRotate Toggle */}
+                     {viewMode === 'orbit' && (
+                        <button
+                            onClick={toggleAutoRotate}
+                            className="flex flex-col gap-1 pointer-events-auto hover:scale-105 transition-transform"
+                        >
+                            <span className="text-emerald-400/70 text-[9px] tracking-[0.3em]">ROTATE</span>
+                            <span className={`text-xs font-medium transition-colors ${
+                                autoRotateEnabled
+                                    ? 'text-emerald-400'
+                                    : 'text-white/40'
+                            }`}>
+                                {autoRotateEnabled ? 'AUTO' : 'OFF'}
+                            </span>
+                        </button>
+                     )}
                 </div>
                 <div className="font-mono text-[9px] text-white/20 tracking-[0.2em] font-light">
                     VEA © 2026

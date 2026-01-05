@@ -21,10 +21,10 @@ function CameraController() {
     const subPhase = useStore((s) => s.subPhase);
     const viewMode = useStore((s) => s.viewMode);
 
-    // Increase FOV for Scene 5 (walkthrough mode)
+    // Adjust FOV for Scene 5 (walkthrough mode) - REDUCED to minimize zoom
     useEffect(() => {
         if (viewMode === 'fps' || chapter === 5) {
-            camera.fov = 75; // Wider FOV for first-person view
+            camera.fov = 50; // Reduced FOV to see more (less zoom)
         } else {
             camera.fov = 45; // Default FOV for orbit view
         }
@@ -34,12 +34,12 @@ function CameraController() {
     useEffect(() => {
         if (viewMode === 'fps') return;
 
-        // Camera States for each Chapter
+        // Camera States for each Chapter - SCENES 0-3 STAY AT SAME POSITION (NO ANIMATION)
         const states = [
             { pos: [20, 20, 20], target: [0, 0, 0] },     // 0-3: Same position
-            { pos: [20, 20, 20], target: [0, 0, 0] },    // 1: Context
-            { pos: [20, 20, 20], target: [0, 0, 0] },      // 2: Design
-            { pos: [20, 20, 20], target: [0, 0, 0] },    // 3: Structure
+            { pos: [20, 20, 20], target: [0, 0, 0] },
+            { pos: [20, 20, 20], target: [0, 0, 0] },
+            { pos: [20, 20, 20], target: [0, 0, 0] },
         ];
 
         // Interior Camera Angles (Scene 4) - Mapped to subPhase 0-5
@@ -63,27 +63,23 @@ function CameraController() {
                 // @ts-ignore
                 controls.update();
             }
-        } else {
-            // SMOOTH ANIMATION for Exterior
+        } else if (chapter <= 3) {
+            // NO ANIMATION for scenes 0-3 - instant position
             const state = states[chapter] || states[0];
-            gsap.to(camera.position, {
-                x: state.pos[0],
-                y: state.pos[1],
-                z: state.pos[2],
-                duration: 2,
-                ease: "power3.inOut"
-            });
+            camera.position.set(state.pos[0], state.pos[1], state.pos[2]);
+            camera.lookAt(state.target[0], state.target[1], state.target[2]);
 
             if (controls) {
                 // @ts-ignore
-                gsap.to(controls.target, {
-                    x: state.target[0],
-                    y: state.target[1],
-                    z: state.target[2],
-                    duration: 2,
-                    ease: "power3.inOut"
-                });
+                controls.target.set(state.target[0], state.target[1], state.target[2]);
+                // @ts-ignore
+                controls.update();
             }
+        } else {
+            // For other scenes (Scene 5+), maintain default behavior
+            const state = states[chapter] || states[0];
+            camera.position.set(state.pos[0], state.pos[1], state.pos[2]);
+            camera.lookAt(state.target[0], state.target[1], state.target[2]);
         }
     }, [chapter, subPhase, viewMode, camera, controls]);
 
@@ -91,8 +87,13 @@ function CameraController() {
 }
 
 function DynamicLighting() {
-    const { sunIntensity, envIntensity, hdriIntensity, sunColor } = useStore();
+    const { sunIntensity, envIntensity, hdriIntensity, sunColor, quality } = useStore();
     const { scene } = useThree();
+
+    // Select HDRI based on quality - ULTRA uses studio lighting
+    const hdriFile = quality === 'ultra'
+        ? "https://raw.githubusercontent.com/decentralize-dfw/vea-randomfiles/main/studio_small_09_2k.hdr"
+        : "https://raw.githubusercontent.com/decentralize-dfw/vea_001/main/RealismHDRI-_equirectangular-jpg_VR360_neon_drenched_skyscrapers_1656103290_10361044.hdr";
 
     // Sync environment intensity
     useEffect(() => {
@@ -113,9 +114,9 @@ function DynamicLighting() {
     return (
         <>
             <Environment
-                files="https://raw.githubusercontent.com/decentralize-dfw/vea_001/main/RealismHDRI-_equirectangular-jpg_VR360_neon_drenched_skyscrapers_1656103290_10361044.hdr"
+                files={hdriFile}
                 background={false}
-                blur={1}
+                blur={quality === 'ultra' ? 0.5 : 1}
             />
             <directionalLight
                 position={[10, 50, 20]}
@@ -158,14 +159,8 @@ function ScreenshotHandler() {
 }
 
 function AutoRotatingOrbitControls() {
-    const chapter = useStore(s => s.currentChapter);
-    const [autoRotate, setAutoRotate] = useState(true);
+    const autoRotateEnabled = useStore(s => s.autoRotateEnabled);
     const controlsRef = useRef<any>(null);
-
-    // Reset autoRotate to true whenever chapter changes
-    useEffect(() => {
-        setAutoRotate(true);
-    }, [chapter]);
 
     return (
         <OrbitControls
@@ -174,12 +169,8 @@ function AutoRotatingOrbitControls() {
             enablePan={false}
             enableDamping
             dampingFactor={0.05}
-            autoRotate={autoRotate}
+            autoRotate={autoRotateEnabled}
             autoRotateSpeed={0.25}
-            onChange={() => {
-                // Stop autoRotate on user interaction
-                if (autoRotate) setAutoRotate(false);
-            }}
         />
     );
 }
@@ -293,11 +284,17 @@ export function Scene() {
                     id="canvas-container"
                     shadows
                     dpr={dpr}
-                    camera={{ position: [20, 20, 20], fov: 45 }}
-                    gl={{ 
-                        powerPreference: 'high-performance', 
-                        antialias: false, 
-                        stencil: false, 
+                    orthographic
+                    camera={{
+                        position: [20, 20, 20],
+                        zoom: 50,
+                        near: 0.1,
+                        far: 1000
+                    }}
+                    gl={{
+                        powerPreference: 'high-performance',
+                        antialias: false,
+                        stencil: false,
                         depth: true,
                         toneMapping: THREE.ACESFilmicToneMapping,
                         preserveDrawingBuffer: true
