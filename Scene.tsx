@@ -21,6 +21,7 @@ function CameraController() {
     const subPhase = useStore((s) => s.subPhase);
     const viewMode = useStore((s) => s.viewMode);
     const cameraSetFor0to3 = useRef(false); // Track if camera was set for scenes 0-3
+    const previousChapter = useRef(0); // Track previous chapter for Scene 5 logic
 
     // HTML-matched FOV: Scene 4 & 5 use FOV 90
     useEffect(() => {
@@ -73,10 +74,20 @@ function CameraController() {
             }
             // If already set, DO NOTHING - camera stays where user left it
         } else if (chapter === 5) {
-            // Scene 5: HTML-matched initial position for walkthrough
-            camera.position.set(1.4, 1.6, -0.6);
+            // Scene 5: Start from Scene 4 position OR Grand Salon default
+            if (previousChapter.current !== 4) {
+                // Coming from Scene 0,1,2,3 -> Start at Grand Salon (first camera position of Scene 4)
+                camera.position.set(1, 1.6, 1.6);
+                console.log('Scene 5: Starting from Grand Salon (default)');
+            } else {
+                // Coming from Scene 4 -> Keep current camera position
+                console.log('Scene 5: Keeping Scene 4 camera position');
+            }
             cameraSetFor0to3.current = false;
         }
+
+        // Update previous chapter for next transition
+        previousChapter.current = chapter;
     }, [chapter, subPhase, viewMode, camera, controls]);
 
     return null;
@@ -84,6 +95,7 @@ function CameraController() {
 
 function DynamicLighting() {
     const { sunIntensity, envIntensity, sunColor, quality } = useStore();
+    const chapter = useStore((s) => s.currentChapter);
     const { scene } = useThree();
 
     // CRITICAL: Use SAME HDRI for both HIGH and ULTRA (user requirement)
@@ -111,9 +123,12 @@ function DynamicLighting() {
                 shadow-bias={-0.0001}
                 shadow-mapSize={[2048, 2048]}
             />
-             <AccumulativeShadows temporal frames={60} alphaTest={0.85} opacity={0.7} scale={50} position={[0, -0.01, 0]}>
-                <RandomizedLight amount={8} radius={5} ambient={0.5} intensity={1} position={[10, 20, 10]} bias={0.001} />
-            </AccumulativeShadows>
+            {/* AccumulativeShadows ONLY for outdoor scenes (0-3) - causes weird shadows in interior */}
+            {chapter <= 3 && (
+                <AccumulativeShadows temporal frames={60} alphaTest={0.85} opacity={0.7} scale={50} position={[0, -0.01, 0]}>
+                    <RandomizedLight amount={8} radius={5} ambient={0.5} intensity={1} position={[10, 20, 10]} bias={0.001} />
+                </AccumulativeShadows>
+            )}
         </>
     );
 }
@@ -146,6 +161,7 @@ function ScreenshotHandler() {
 function AutoRotatingOrbitControls() {
     const autoRotateEnabled = useStore(s => s.autoRotateEnabled);
     const toggleAutoRotate = useStore(s => s.toggleAutoRotate);
+    const chapter = useStore(s => s.currentChapter);
     const controlsRef = useRef<any>(null);
     const userInteractedRef = useRef(false);
 
@@ -174,6 +190,7 @@ function AutoRotatingOrbitControls() {
             dampingFactor={0.05}
             autoRotate={autoRotateEnabled}
             autoRotateSpeed={0.25}
+            enableZoom={chapter !== 4} // Scene 4: Disable zoom (camera stays fixed)
             onStart={handleUserInteraction}
         />
     );
